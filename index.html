@@ -12,8 +12,12 @@
       --text:#e5e7eb;/* gray-200 */
       --accent:#22d3ee;/* cyan-400 */
       --accent-2:#a78bfa;/* violet-400 */
-      --ok:#34d399;/* green-400 */
-      --bad:#f87171;/* red-400 */
+      --ok:#10b981;/* emerald-500 - brighter green */
+      --ok-bg:#064e3b;/* emerald-900 - darker bg */
+      --ok-border:#059669;/* emerald-600 */
+      --bad:#ef4444;/* red-500 - brighter red */
+      --bad-bg:#7f1d1d;/* red-900 - darker bg */
+      --bad-border:#dc2626;/* red-600 */
       --warn:#f59e0b;/* amber-500 */
       --card:#0b122fff;
       --border:#233153;
@@ -44,7 +48,7 @@
     .btn.secondary{background:#0b122f; color:var(--text); border:1px solid var(--border); box-shadow:none}
     .btn.ghost{background:transparent; color:var(--muted); border:1px dashed var(--border)}
     .btn.small{padding:6px 10px; font-weight:600}
-    .btn[disabled]{opacity:.5; cursor:not-allowed}
+    .btn[disabled]{cursor:not-allowed}
 
     /* Prevent mobile browsers (iOS Safari) from zooming when focusing inputs
        by ensuring a minimum font-size on small screens and disabling
@@ -65,9 +69,9 @@
     .q-header h4{margin:0}
     .opt{display:flex; align-items:flex-start; gap:10px; padding:8px 10px; border-radius:10px; border:1px solid transparent}
     .opt input{margin-top:3px}
-    .opt.correct{border-color:#2b825d55; background:#0c1a1340}
-    .opt.incorrect{border-color:#82302b55; background:#1a0c0c40}
-    .opt.show-answer{border-color:#2b825d55; background:#0c1a1340}
+    .opt.correct{border-color:var(--ok-border); background:var(--ok-bg); box-shadow:0 0 12px rgba(16, 185, 129, 0.3)}
+    .opt.incorrect{border-color:var(--bad-border); background:var(--bad-bg); box-shadow:0 0 12px rgba(239, 68, 68, 0.3)}
+    .opt.show-answer{border-color:var(--ok-border); background:var(--ok-bg); box-shadow:0 0 12px rgba(16, 185, 129, 0.3)}
     .q.checked .opt input{pointer-events:none}
     .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#0b122f; color:var(--muted); font-size:12px}
     .score{font-weight:800}
@@ -77,6 +81,15 @@
     .badge{font-size:11px; padding:3px 8px; border:1px solid var(--border); border-radius:999px; color:var(--muted)}
     .flex{display:flex; gap:8px; align-items:center}
     .right{margin-left:auto}
+
+    /* Input mode toggle */
+    .mode-toggle{display:flex; gap:8px; margin-bottom:12px}
+    .mode-btn{padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:#0b122f; color:var(--muted); cursor:pointer; font-size:13px}
+    .mode-btn.active{background:var(--accent); color:#00111a; font-weight:600}
+    .input-mode{display:none}
+    .input-mode.active{display:block}
+    #urlInputContainer{display:flex; gap:8px; align-items:flex-start; margin-bottom:12px}
+    #urlInput{flex:1}
   </style>
 </head>
 <body>
@@ -95,10 +108,30 @@
       <div class="card">
         <div class="row">
           <div style="flex:1 1 560px; min-width:320px">
-            <label for="raw" class="hint">Dán văn bản câu hỏi ở đây. Hỗ trợ 2 định dạng đánh đáp án:</label>
-            <textarea id="raw" placeholder="Ví dụ:\n1) Thủ đô của Canada là gì?\nA) Toronto\nB) Vancouver\nC) Ottawa\nD) Montreal\nĐáp án: C\n---\nDãy núi dài nhất thế giới là?\n- A. Himalaya\n- B. Andes *\n- C. Rocky\n- D. Alps\n"></textarea>
+            <!-- Mode Toggle -->
+            <div class="mode-toggle">
+              <button class="mode-btn" id="btnModeText">📝 Nhập văn bản</button>
+              <button class="mode-btn active" id="btnModeUrl">🔗 Nhập URL</button>
+            </div>
+
+            <!-- Text Input Mode -->
+            <div class="input-mode" id="modeText">
+              <label for="raw" class="hint">Dán văn bản câu hỏi ở đây. Hỗ trợ 2 định dạng đánh đáp án:</label>
+              <textarea id="raw" placeholder="Ví dụ:\n1) Thủ đô của Canada là gì?\nA) Toronto\nB) Vancouver\nC) Ottawa\nD) Montreal\nĐáp án: C\n---\nDãy núi dài nhất thế giới là?\n- A. Himalaya\n- B. Andes *\n- C. Rocky\n- D. Alps\n"></textarea>
+            </div>
+
+            <!-- URL Input Mode -->
+            <div class="input-mode active" id="modeUrl">
+              <label for="urlInput" class="hint">Nhập URL để lấy nội dung câu hỏi:</label>
+              <div id="urlInputContainer">
+                <input type="text" id="urlInput" placeholder="https://example.com/questions.txt" />
+                <button class="btn small" id="btnCheckUrl">Kiểm tra</button>
+              </div>
+              <div class="hint" id="urlStatus"></div>
+            </div>
+
             <div class="hint">
-              <strong>Format 1 — “Đáp án: X”</strong>: Dòng cuối của mỗi câu có dạng <em>Đáp án: B</em>.<br/>
+              <strong>Format 1 — "Đáp án: X"</strong>: Dòng cuối của mỗi câu có dạng <em>Đáp án: B</em>.<br/>
               <strong>Format 2 — dấu *</strong>: Đặt dấu <code>*</code> ở cuối lựa chọn đúng. Chấp nhận kí hiệu A) / A. / - A. / • A. v.v.<br/>
               Dùng một trong các phân cách giữa câu hỏi: dòng chứa <code>---</code> hoặc để <em>một dòng trống</em>.
             </div>
@@ -283,6 +316,8 @@
       let questions = state.questions.slice();
       if(state.shuffleQ) questions = shuffle(questions);
 
+      // Store shuffled questions for checking answers
+      state.shuffledQuestions = questions;
 
         // Pagination logic
         const totalPages = Math.ceil(questions.length / PAGE_SIZE);
@@ -370,7 +405,8 @@
       
       const inputs = $$('input', card);
       const selected = new Set(inputs.filter(i=>i.checked).map(i=>parseInt(i.value,10)));
-      const ans = new Set(state.questions[qi].answer);
+      // Use shuffled questions instead of original state.questions
+      const ans = new Set(state.shuffledQuestions[qi].answer);
 
       // Mark card as checked to disable further input
       card.classList.add('checked');
@@ -400,9 +436,13 @@
       if(sameSize && allIn){
         checkBtn.textContent = '✓ Đúng';
         checkBtn.style.background = 'var(--ok)';
+        checkBtn.style.color = 'white';
+        checkBtn.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.5)';
       } else {
         checkBtn.textContent = '✗ Sai';
         checkBtn.style.background = 'var(--bad)';
+        checkBtn.style.color = 'white';
+        checkBtn.style.boxShadow = '0 0 16px rgba(239, 68, 68, 0.5)';
       }
       checkBtn.disabled = true;
     }
@@ -411,10 +451,12 @@
       const cards = $$('#quizArea .q');
       let correct=0;
 
-      cards.forEach((card, qi)=>{
+      cards.forEach((card, idx)=>{
+        const qi = parseInt(card.dataset.questionIndex, 10);
         const inputs = $$('input', card);
         const selected = new Set(inputs.filter(i=>i.checked).map(i=>parseInt(i.value,10)));
-        const ans = new Set(state.questions[qi].answer);
+        // Use shuffled questions instead of original state.questions
+        const ans = new Set(state.shuffledQuestions[qi].answer);
 
         inputs.forEach(i=>{
           const label = i.parentElement;
@@ -422,7 +464,7 @@
           const isCorrect = ans.has(idx);
           if(i.checked && isCorrect){ label.classList.add('correct'); }
           else if(i.checked && !isCorrect){ label.classList.add('incorrect'); }
-          if(isCorrect){ label.style.borderColor = '#2b825d55'; }
+          if(isCorrect){ label.classList.add('show-answer'); }
         });
 
         // score: full marks only if sets equal
@@ -528,6 +570,56 @@
       $$('.panel').forEach(p=>p.classList.toggle('active', p.id===`panel-${name}`));
     }
     $$('.tab').forEach(btn=>btn.addEventListener('click', ()=>activate(btn.dataset.tab)));
+
+    // Input Mode Toggle (Text vs URL)
+    let fetchedContent = null; // Store fetched content temporarily
+    
+    function switchInputMode(mode) {
+      if (mode === 'text') {
+        $('#btnModeText').classList.add('active');
+        $('#btnModeUrl').classList.remove('active');
+        $('#modeText').classList.add('active');
+        $('#modeUrl').classList.remove('active');
+        // If we have fetched content, populate textarea
+        if (fetchedContent) {
+          $('#raw').value = fetchedContent;
+          fetchedContent = null;
+        }
+      } else if (mode === 'url') {
+        $('#btnModeText').classList.remove('active');
+        $('#btnModeUrl').classList.add('active');
+        $('#modeText').classList.remove('active');
+        $('#modeUrl').classList.add('active');
+      }
+    }
+
+    $('#btnModeText').addEventListener('click', () => switchInputMode('text'));
+    $('#btnModeUrl').addEventListener('click', () => switchInputMode('url'));
+
+    // Check URL button
+    $('#btnCheckUrl').addEventListener('click', () => {
+      const url = $('#urlInput').value.trim();
+      if (!url) {
+        $('#urlStatus').textContent = '⚠️ Vui lòng nhập URL';
+        return;
+      }
+      
+      $('#urlStatus').textContent = '⏳ Đang kiểm tra...';
+      $('#btnCheckUrl').disabled = true;
+
+      fetch(url)
+        .then(r => r.ok ? r.text() : Promise.reject(`HTTP ${r.status}: ${r.statusText}`))
+        .then(text => {
+          // Directly populate textarea so user can create quiz immediately
+          $('#raw').value = text;
+          $('#urlStatus').innerHTML = `✅ Đã lấy thành công ${text.length} ký tự. Bạn có thể bấm "Tạo đề" ngay!`;
+          $('#btnCheckUrl').disabled = false;
+        })
+        .catch(e => {
+          $('#urlStatus').textContent = `❌ Lỗi: ${e}`;
+          $('#btnCheckUrl').disabled = false;
+        });
+    });
 
     // Init
     state.allowMulti = $('#allowMulti').checked;
