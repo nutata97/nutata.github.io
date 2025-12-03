@@ -1,323 +1,678 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quiz Builder VN — Tạo đề trắc nghiệm từ văn bản</title>
-  <style>
-    :root{
-      --bg:#0f172a;/* slate-900 */
-      --panel:#111827ee;/* gray-900 */
-      --muted:#94a3b8;/* slate-400 */
-      --text:#e5e7eb;/* gray-200 */
-      --accent:#22d3ee;/* cyan-400 */
-      --accent-2:#a78bfa;/* violet-400 */
-      --ok:#10b981;/* emerald-500 - brighter green */
-      --ok-bg:#064e3b;/* emerald-900 - darker bg */
-      --ok-border:#059669;/* emerald-600 */
-      --bad:#ef4444;/* red-500 - brighter red */
-      --bad-bg:#7f1d1d;/* red-900 - darker bg */
-      --bad-border:#dc2626;/* red-600 */
-      --warn:#f59e0b;/* amber-500 */
-      --card:#0b122fff;
-      --border:#233153;
-    }
-    html, body{height:100%;}
-    body{
-      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 600px at 100% -20%, #1f2937 0%, transparent 60%),
-                  radial-gradient(1200px 600px at -10% -20%, #1f2937 0%, transparent 60%),
-                  var(--bg);
-      color:var(--text);
-    }
-    .container{max-width:1100px; margin:0 auto; padding:24px;padding-bottom:48px;}
-    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .title{font-size:22px;font-weight:700;letter-spacing:0.3px}
-    .tabs{display:flex; gap:8px; flex-wrap:wrap;justify-content:flex-end;}
-    .tab{padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,#0e1533, #0a1026);cursor:pointer; color:white}
-    .tab.active{outline:2px solid var(--accent); color:white}
-    .panel{display:none}
-    .panel.active{display:block}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Builder VN — Tạo đề trắc nghiệm từ văn bản</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        /* slate-900 */
+        --panel: #111827ee;
+        /* gray-900 */
+        --muted: #94a3b8;
+        /* slate-400 */
+        --text: #e5e7eb;
+        /* gray-200 */
+        --accent: #22d3ee;
+        /* cyan-400 */
+        --accent-2: #a78bfa;
+        /* violet-400 */
+        --ok: #10b981;
+        /* emerald-500 - brighter green */
+        --ok-bg: #064e3b;
+        /* emerald-900 - darker bg */
+        --ok-border: #059669;
+        /* emerald-600 */
+        --bad: #ef4444;
+        /* red-500 - brighter red */
+        --bad-bg: #7f1d1d;
+        /* red-900 - darker bg */
+        --bad-border: #dc2626;
+        /* red-600 */
+        --warn: #f59e0b;
+        /* amber-500 */
+        --card: #0b122fff;
+        --border: #233153;
+      }
 
-    .card{background:linear-gradient(180deg,#0c1330,#0a0f24);border:1px solid var(--border);border-radius:16px; padding:16px; box-shadow:0 10px 25px #0006;}
-    .row{display:flex; gap:16px; flex-wrap:wrap}
-    textarea, input[type="text"], select{width:100%; background:#0b122f; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:12px; outline:none; padding-right:0;}
-    textarea{min-height:260px; resize:vertical;}
-    .hint{color:var(--muted); font-size:13px; line-height:1.5}
-    .btn{appearance:none;border:none;background:linear-gradient(90deg,var(--accent), var(--accent-2)); color:#00111a; font-weight:700; padding:10px 14px; border-radius:12px; cursor:pointer; box-shadow:0 6px 18px #0009}
-    .btn.secondary{background:#0b122f; color:var(--text); border:1px solid var(--border); box-shadow:none}
-    .btn.ghost{background:transparent; color:var(--muted); border:1px dashed var(--border)}
-    .btn.small{padding:6px 10px; font-weight:600}
-    .btn[disabled]{cursor:not-allowed}
+      html,
+      body {
+        height: 100%;
+      }
 
-    /* Prevent mobile browsers (iOS Safari) from zooming when focusing inputs
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: radial-gradient(
+            1200px 600px at 100% -20%,
+            #1f2937 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            1200px 600px at -10% -20%,
+            #1f2937 0%,
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
+        padding-bottom: 48px;
+      }
+
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .title {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .tab {
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: linear-gradient(180deg, #0e1533, #0a1026);
+        cursor: pointer;
+        color: white;
+      }
+
+      .tab.active {
+        outline: 2px solid var(--accent);
+        color: white;
+      }
+
+      .panel {
+        display: none;
+      }
+
+      .panel.active {
+        display: block;
+      }
+
+      .card {
+        background: linear-gradient(180deg, #0c1330, #0a0f24);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 25px #0006;
+      }
+
+      .row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      textarea,
+      input[type="text"],
+      select {
+        width: 100%;
+        background: #0b122f;
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        outline: none;
+        padding-right: 0;
+      }
+
+      textarea {
+        min-height: 260px;
+        resize: vertical;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .btn {
+        appearance: none;
+        border: none;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #00111a;
+        font-weight: 700;
+        padding: 10px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px #0009;
+      }
+
+      .btn.secondary {
+        background: #0b122f;
+        color: var(--text);
+        border: 1px solid var(--border);
+        box-shadow: none;
+      }
+
+      .btn.ghost {
+        background: transparent;
+        color: var(--muted);
+        border: 1px dashed var(--border);
+      }
+
+      .btn.small {
+        padding: 6px 10px;
+        font-weight: 600;
+      }
+
+      .btn[disabled] {
+        cursor: not-allowed;
+      }
+
+      /* Prevent mobile browsers (iOS Safari) from zooming when focusing inputs
        by ensuring a minimum font-size on small screens and disabling
        automatic text-size adjustment. This preserves accessibility while
        avoiding unwanted zoom-on-focus. */
-    html, body { -webkit-text-size-adjust: 100%; }
-    @media (max-width: 600px) {
-      input, textarea, select, button, .btn { font-size: 16px; }
-    }
-
-    .grid{display:grid; gap:12px}
-    .grid.cols-2{grid-template-columns:1fr 1fr}
-    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
-
-    .q{border:1px solid var(--border); background:var(--card); border-radius:14px; padding:14px}
-    .q h4{margin:0 0 10px 0; font-size:16px}
-    .q-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
-    .q-header h4{margin:0}
-    .opt{display:flex; align-items:flex-start; gap:10px; padding:8px 10px; border-radius:10px; border:1px solid transparent}
-    .opt input{margin-top:3px}
-    .opt.correct{border-color:var(--ok-border); background:var(--ok-bg); box-shadow:0 0 12px rgba(16, 185, 129, 0.3)}
-    .opt.incorrect{border-color:var(--bad-border); background:var(--bad-bg); box-shadow:0 0 12px rgba(239, 68, 68, 0.3)}
-    .opt.show-answer{border-color:var(--ok-border); background:var(--ok-bg); box-shadow:0 0 12px rgba(16, 185, 129, 0.3)}
-    .q.checked .opt input{pointer-events:none}
-    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#0b122f; color:var(--muted); font-size:12px}
-    .score{font-weight:800}
-    .footer-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
-
-    code.sample{display:block; white-space:pre-wrap; background:#0b122f; border:1px solid var(--border); color:#cbd5e1; padding:12px; border-radius:12px; font-size:12px}
-    .badge{font-size:11px; padding:3px 8px; border:1px solid var(--border); border-radius:999px; color:var(--muted)}
-    .flex{display:flex; gap:8px; align-items:center}
-    .right{margin-left:auto}
-
-    /* Input mode toggle */
-    .mode-toggle{display:flex; gap:8px; margin-bottom:12px}
-    .mode-btn{padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:#0b122f; color:var(--muted); cursor:pointer; font-size:13px}
-    .mode-btn.active{background:var(--accent); color:#00111a; font-weight:600}
-    .input-mode{display:none}
-    .input-mode.active{display:block}
-    #urlInputContainer{display:flex; gap:8px; align-items:flex-start; margin-bottom:12px}
-    #urlInput{flex:1}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div class="title">🧠 Quiz Builder VN <span class="badge">HTML/CSS/JS thuần</span></div>
-      <div class="tabs">
-        <button class="tab active" data-tab="input">Nhập liệu</button>
-        <button class="tab" data-tab="quiz">Làm bài</button>
-        <button class="tab" data-tab="export">Xuất / Nhập</button>
-      </div>
-    </header>
-
-    <!-- Panel: Input -->
-    <section class="panel active" id="panel-input">
-      <div class="card">
-        <div class="row">
-          <div style="flex:1 1 560px; min-width:320px">
-            <!-- Mode Toggle -->
-            <div class="mode-toggle">
-              <button class="mode-btn" id="btnModeText">📝 Nhập văn bản</button>
-              <button class="mode-btn active" id="btnModeUrl">🔗 Nhập URL</button>
-            </div>
-
-            <!-- Text Input Mode -->
-            <div class="input-mode" id="modeText">
-              <label for="raw" class="hint">Dán văn bản câu hỏi ở đây. Hỗ trợ 2 định dạng đánh đáp án:</label>
-              <textarea id="raw" placeholder="Ví dụ:\n1) Thủ đô của Canada là gì?\nA) Toronto\nB) Vancouver\nC) Ottawa\nD) Montreal\nĐáp án: C\n---\nDãy núi dài nhất thế giới là?\n- A. Himalaya\n- B. Andes *\n- C. Rocky\n- D. Alps\n"></textarea>
-            </div>
-
-            <!-- URL Input Mode -->
-            <div class="input-mode active" id="modeUrl">
-              <label for="urlInput" class="hint">Nhập URL để lấy nội dung câu hỏi:</label>
-              <div id="urlInputContainer">
-                <input type="text" id="urlInput" placeholder="https://example.com/questions.txt" />
-                <button class="btn small" id="btnCheckUrl">Kiểm tra</button>
-              </div>
-              <div class="hint" id="urlStatus"></div>
-            </div>
-
-            <div class="hint">
-              <strong>Format 1 — "Đáp án: X"</strong>: Dòng cuối của mỗi câu có dạng <em>Đáp án: B</em>.<br/>
-              <strong>Format 2 — dấu *</strong>: Đặt dấu <code>*</code> ở cuối lựa chọn đúng. Chấp nhận kí hiệu A) / A. / - A. / • A. v.v.<br/>
-              Dùng một trong các phân cách giữa câu hỏi: dòng chứa <code>---</code> hoặc để <em>một dòng trống</em>.
-            </div>
-          </div>
-          <div style="flex:1 1 340px; min-width:260px">
-            <div class="grid">
-              <label class="hint">Tùy chọn xử lý</label>
-              <div class="flex">
-                <input type="checkbox" id="shuffleQ" checked/>
-                <label for="shuffleQ" class="hint">Xáo thứ tự câu hỏi</label>
-              </div>
-              <div class="flex">
-                <input type="checkbox" id="shuffleA" checked/>
-                <label for="shuffleA" class="hint">Xáo thứ tự đáp án</label>
-              </div>
-              <div class="flex">
-                <input type="checkbox" id="allowMulti"/>
-                <label for="allowMulti" class="hint">Cho phép nhiều đáp án đúng (khi nhập nhiều dấu *)</label>
-              </div>
-              <div class="flex">
-                <input type="checkbox" id="trimSpaces" checked/>
-                <label for="trimSpaces" class="hint">Tự loại bỏ số thứ tự, khoảng trắng thừa</label>
-              </div>
-              <div class="flex">
-                <input type="number" id="limitQuestions" min="0" value="0" style="max-width:140px">
-                <label for="limitQuestions" class="hint">Giới hạn số câu (0 = tất cả)</label>
-              </div>
-              <div class="flex">
-                <button class="btn small" id="btnParse">Tạo đề</button>
-                <button class="btn secondary small" id="btnLoadDemo">Tải ví dụ</button>
-                <button class="btn ghost small" id="btnClear">Xóa</button>
-              </div>
-              <div class="hint" id="parseStatus"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel: Quiz -->
-    <section class="panel" id="panel-quiz">
-      <div class="card" id="quizCard">
-        <div class="row" style="justify-content:space-between; align-items:center">
-          <div class="pill">Tổng câu: <span id="totalQ">0</span></div>
-          <div class="flex">
-            <button class="btn secondary small" id="btnRestart" disabled>Làm lại</button>
-            <button class="btn small" id="btnSubmit" disabled>Nộp bài</button>
-          </div>
-        </div>
-        <div id="quizArea" style="margin-top:12px" class="grid"></div>
-        <div class="footer-actions" style="margin-top:14px">
-          <div id="result" class="hint"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel: Export / Import -->
-    <section class="panel" id="panel-export">
-      <div class="card">
-        <div class="grid cols-2" style="align-items:start">
-          <div>
-            <h3>📤 Xuất JSON</h3>
-            <p class="hint">Sao chép JSON để dùng trong app khác hoặc lưu trữ.</p>
-            <textarea id="jsonOut" placeholder="JSON sẽ xuất hiện sau khi bấm Tạo đề"></textarea>
-            <div class="flex">
-              <button class="btn small" id="btnCopyJSON">Copy JSON</button>
-              <button class="btn secondary small" id="btnDownloadJSON">Tải .json</button>
-            </div>
-          </div>
-          <div>
-            <h3>📥 Nhập JSON</h3>
-            <p class="hint">Dán JSON đúng cấu trúc <code>{ questions:[{text, options:[..], answer:[indices]}] }</code> để tải đề.</p>
-            <textarea id="jsonIn" placeholder='{"questions":[{"text":"Câu?","options":["A","B"],"answer":[1]}]}'></textarea>
-            <div class="flex">
-              <button class="btn small" id="btnLoadJSON">Tải từ JSON</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <script>
-    // Utilities
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-
-    const state = { questions: [], allowMulti:false, shuffleQ:true, shuffleA:true };
-
-    // Pagination state
-    let currentPage = 1;
-    const PAGE_SIZE = 10;
-
-    function shuffle(arr){
-      const a = arr.slice();
-      for(let i=a.length-1;i>0;i--){
-        const j=Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
+      html,
+      body {
+        -webkit-text-size-adjust: 100%;
       }
-      return a;
-    }
 
-    function normalizeLine(s){
-      // Remove optional bullet (-, •), then a leading number or letter followed by ) or .
-      // Examples removed: "1.", "a.", "A)", "- a.", "• 2)"
-      return s.replace(/^\s*(?:[-•]\s*)?(?:\d+|[A-Za-z])[)\.]\s*/,'').trim();
-    }
-
-    function parseRaw(raw, opts){
-      const {allowMulti, trimSpaces, limit} = opts;
-      const parts = raw
-        .replace(/\r\n?/g, '\n')
-        .split(/\n\s*\n|\n?---+\n?/g) // blank line or --- as separator
-        .map(s=>s.trim()).filter(Boolean);
-
-      const questions=[];
-
-      for(const block of parts){
-        const lines = block.split('\n').map(l=>l.trim()).filter(Boolean);
-        if(lines.length<2) continue;
-
-        // Detect explicit answer line: "Đáp án: X, Y" or "Answer: B"
-        let answerLineIndex = lines.findIndex(l=>/^((Đ|D)a(p|́)p\s*a(n|́)n|Answer)\s*:/i.test(l));
-        let answerLetters=[];
-        if(answerLineIndex>=0){
-          // Accept letters a-z or A-Z (e.g. "Đáp án: a, c" or "Answer: B")
-          const m = lines[answerLineIndex].match(/:([A-Za-z](?:\s*,\s*[A-Za-z])*)/);
-          if(m){ answerLetters = m[1].split(/\s*,\s*/).map(c=>c.toUpperCase()); }
-          lines.splice(answerLineIndex,1); // remove answer line
+      @media (max-width: 600px) {
+        input,
+        textarea,
+        select,
+        button,
+        .btn {
+          font-size: 16px;
         }
+      }
 
-        // First non-empty line is question text
-        const qtext = lines.shift().replace(/^\d+\s*[\)\.]\s*/,'').trim();
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
 
-  // Remaining lines are options. Accept 2-8 options.
-  // Allow options that start with markers like "a. ", "b) ", "1. ", "- a. " etc.
-  const rawOpts = lines.map(l=>l.replace(/^\s*(?:[-•]\s*)?(?:[A-Za-z]|\d+)[\)\.]\s*/,''));
-        const options = [];
-        const answerIdx = new Set();
-        rawOpts.forEach((l, idx)=>{
-          // Check trailing * as correct
-          const starred = /\*\s*$/.test(l);
-          let clean = l.replace(/\*\s*$/,'').trim();
-          if(trimSpaces) clean = normalizeLine(clean);
-          if(!clean) return;
-          options.push(clean);
-          if(starred) answerIdx.add(options.length-1);
-        });
+      .grid.cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
 
-        // If explicit letters were provided (A,B,..), override
-        if(answerLetters.length && options.length){
-          answerIdx.clear();
-          answerLetters.forEach(letter=>{
-            const i = letter.charCodeAt(0)-65; // A->0
-            if(i>=0 && i<options.length) answerIdx.add(i);
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .q {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      .q h4 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+      }
+
+      .q-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .q-header h4 {
+        margin: 0;
+      }
+
+      .opt {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+      }
+
+      .opt input {
+        margin-top: 3px;
+      }
+
+      .opt.correct {
+        border-color: var(--ok-border);
+        background: var(--ok-bg);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .opt.incorrect {
+        border-color: var(--bad-border);
+        background: var(--bad-bg);
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+      }
+
+      .opt.show-answer {
+        border-color: var(--ok-border);
+        background: var(--ok-bg);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+      }
+
+      .q.checked .opt input {
+        pointer-events: none;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: #0b122f;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .score {
+        font-weight: 800;
+      }
+
+      .footer-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      code.sample {
+        display: block;
+        white-space: pre-wrap;
+        background: #0b122f;
+        border: 1px solid var(--border);
+        color: #cbd5e1;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 12px;
+      }
+
+      .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--muted);
+      }
+
+      .flex {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .right {
+        margin-left: auto;
+      }
+
+      /* Input mode toggle */
+      .mode-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .mode-btn {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #0b122f;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .mode-btn.active {
+        background: var(--accent);
+        color: #00111a;
+        font-weight: 600;
+      }
+
+      .input-mode {
+        display: none;
+      }
+
+      .input-mode.active {
+        display: block;
+      }
+
+      #urlInputContainer {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      #urlInput {
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="title">
+          🧠 Quiz Builder VN <span class="badge">HTML/CSS/JS thuần</span>
+        </div>
+        <div class="tabs">
+          <button class="tab active" data-tab="input">Nhập liệu</button>
+          <button class="tab" data-tab="quiz">Làm bài</button>
+          <button class="tab" data-tab="export">Xuất / Nhập</button>
+        </div>
+      </header>
+
+      <!-- Panel: Input -->
+      <section class="panel active" id="panel-input">
+        <div class="card">
+          <div class="row">
+            <div style="flex: 1 1 560px; min-width: 320px">
+              <!-- Mode Toggle -->
+              <div class="mode-toggle">
+                <button class="mode-btn" id="btnModeText">
+                  📝 Nhập văn bản
+                </button>
+                <button class="mode-btn active" id="btnModeUrl">
+                  🔗 Nhập URL
+                </button>
+              </div>
+
+              <!-- Text Input Mode -->
+              <div class="input-mode" id="modeText">
+                <label for="raw" class="hint"
+                  >Dán văn bản câu hỏi ở đây. Hỗ trợ 2 định dạng đánh đáp
+                  án:</label
+                >
+                <textarea
+                  id="raw"
+                  placeholder="Ví dụ:\n1) Thủ đô của Canada là gì?\nA) Toronto\nB) Vancouver\nC) Ottawa\nD) Montreal\nĐáp án: C\n---\nDãy núi dài nhất thế giới là?\n- A. Himalaya\n- B. Andes *\n- C. Rocky\n- D. Alps\n"
+                ></textarea>
+              </div>
+
+              <!-- URL Input Mode -->
+              <div class="input-mode active" id="modeUrl">
+                <label for="urlInput" class="hint"
+                  >Nhập URL để lấy nội dung câu hỏi:</label
+                >
+                <div id="urlInputContainer">
+                  <input
+                    type="text"
+                    id="urlInput"
+                    placeholder="https://example.com/questions.txt"
+                  />
+                  <button class="btn small" id="btnCheckUrl">Kiểm tra</button>
+                </div>
+                <div class="hint" id="urlStatus"></div>
+              </div>
+
+              <div class="hint">
+                <strong>Format 1 — "Đáp án: X"</strong>: Dòng cuối của mỗi câu
+                có dạng <em>Đáp án: B</em>.<br />
+                <strong>Format 2 — dấu *</strong>: Đặt dấu <code>*</code> ở cuối
+                lựa chọn đúng. Chấp nhận kí hiệu A) / A. / - A. / • A. v.v.<br />
+                Dùng một trong các phân cách giữa câu hỏi: dòng chứa
+                <code>---</code> hoặc để <em>một dòng trống</em>.
+              </div>
+            </div>
+            <div style="flex: 1 1 340px; min-width: 260px">
+              <div class="grid">
+                <label class="hint">Tùy chọn xử lý</label>
+                <div class="flex">
+                  <input type="checkbox" id="shuffleQ" checked />
+                  <label for="shuffleQ" class="hint">Xáo thứ tự câu hỏi</label>
+                </div>
+                <div class="flex">
+                  <input type="checkbox" id="shuffleA" checked />
+                  <label for="shuffleA" class="hint">Xáo thứ tự đáp án</label>
+                </div>
+                <div class="flex">
+                  <input type="checkbox" id="allowMulti" />
+                  <label for="allowMulti" class="hint"
+                    >Cho phép nhiều đáp án đúng (khi nhập nhiều dấu *)</label
+                  >
+                </div>
+                <div class="flex">
+                  <input type="checkbox" id="trimSpaces" checked />
+                  <label for="trimSpaces" class="hint"
+                    >Tự loại bỏ số thứ tự, khoảng trắng thừa</label
+                  >
+                </div>
+                <div class="flex">
+                  <input
+                    type="number"
+                    id="limitQuestions"
+                    min="0"
+                    value="0"
+                    style="max-width: 140px"
+                  />
+                  <label for="limitQuestions" class="hint"
+                    >Giới hạn số câu (0 = tất cả)</label
+                  >
+                </div>
+                <div class="flex">
+                  <button class="btn small" id="btnParse">Tạo đề</button>
+                  <button class="btn secondary small" id="btnLoadDemo">
+                    Tải ví dụ
+                  </button>
+                  <button class="btn ghost small" id="btnClear">Xóa</button>
+                </div>
+                <div class="hint" id="parseStatus"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Quiz -->
+      <section class="panel" id="panel-quiz">
+        <div class="card" id="quizCard">
+          <div
+            class="row"
+            style="justify-content: space-between; align-items: center"
+          >
+            <div class="pill">Tổng câu: <span id="totalQ">0</span></div>
+            <div class="flex">
+              <button class="btn secondary small" id="btnRestart" disabled>
+                Làm lại
+              </button>
+              <button class="btn small" id="btnSubmit" disabled>Nộp bài</button>
+            </div>
+          </div>
+          <div id="quizArea" style="margin-top: 12px" class="grid"></div>
+          <div class="footer-actions" style="margin-top: 14px">
+            <div id="result" class="hint"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Export / Import -->
+      <section class="panel" id="panel-export">
+        <div class="card">
+          <div class="grid cols-2" style="align-items: start">
+            <div>
+              <h3>📤 Xuất JSON</h3>
+              <p class="hint">
+                Sao chép JSON để dùng trong app khác hoặc lưu trữ.
+              </p>
+              <textarea
+                id="jsonOut"
+                placeholder="JSON sẽ xuất hiện sau khi bấm Tạo đề"
+              ></textarea>
+              <div class="flex">
+                <button class="btn small" id="btnCopyJSON">Copy JSON</button>
+                <button class="btn secondary small" id="btnDownloadJSON">
+                  Tải .json
+                </button>
+              </div>
+            </div>
+            <div>
+              <h3>📥 Nhập JSON</h3>
+              <p class="hint">
+                Dán JSON đúng cấu trúc
+                <code
+                  >{ questions:[{text, options:[..], answer:[indices]}] }</code
+                >
+                để tải đề.
+              </p>
+              <textarea
+                id="jsonIn"
+                placeholder='{"questions":[{"text":"Câu?","options":["A","B"],"answer":[1]}]}'
+              ></textarea>
+              <div class="flex">
+                <button class="btn small" id="btnLoadJSON">Tải từ JSON</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Utilities
+      const $ = (sel, root = document) => root.querySelector(sel);
+      const $$ = (sel, root = document) =>
+        Array.from(root.querySelectorAll(sel));
+
+      const state = {
+        questions: [],
+        allowMulti: false,
+        shuffleQ: true,
+        shuffleA: true,
+      };
+
+      // Pagination state
+      let currentPage = 1;
+      const PAGE_SIZE = 10;
+
+      function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function normalizeLine(s) {
+        // Remove optional bullet (-, •), then a leading number or letter followed by ) or .
+        // Examples removed: "1.", "a.", "A)", "- a.", "• 2)"
+        return s.replace(/^\s*(?:[-•]\s*)?(?:\d+|[A-Za-z])[)\.]\s*/, "").trim();
+      }
+
+      function parseRaw(raw, opts) {
+        const { allowMulti, trimSpaces, limit } = opts;
+        const parts = raw
+          .replace(/\r\n?/g, "\n")
+          .split(/\n\s*\n|\n?---+\n?/g) // blank line or --- as separator
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        const questions = [];
+
+        for (const block of parts) {
+          const lines = block
+            .split("\n")
+            .map((l) => l.trim())
+            .filter(Boolean);
+          if (lines.length < 2) continue;
+
+          // Detect explicit answer line: "Đáp án: X, Y" or "Answer: B"
+          let answerLineIndex = lines.findIndex((l) =>
+            /^((Đ|D)a(p|́)p\s*a(n|́)n|Answer)\s*:/i.test(l)
+          );
+          let answerLetters = [];
+          if (answerLineIndex >= 0) {
+            // Accept letters a-z or A-Z (e.g. "Đáp án: a, c" or "Answer: B")
+            const m = lines[answerLineIndex].match(
+              /:([A-Za-z](?:\s*,\s*[A-Za-z])*)/
+            );
+            if (m) {
+              answerLetters = m[1].split(/\s*,\s*/).map((c) => c.toUpperCase());
+            }
+            lines.splice(answerLineIndex, 1); // remove answer line
+          }
+
+          // First non-empty line is question text
+          const qtext = lines
+            .shift()
+            .replace(/^\d+\s*[\)\.]\s*/, "")
+            .trim();
+
+          // Remaining lines are options. Accept 2-8 options.
+          // Allow options that start with markers like "a. ", "b) ", "1. ", "- a. " etc.
+          const rawOpts = lines.map((l) =>
+            l.replace(/^\s*(?:[-•]\s*)?(?:[A-Za-z]|\d+)[\)\.]\s*/, "")
+          );
+          const options = [];
+          const answerIdx = new Set();
+          rawOpts.forEach((l, idx) => {
+            // Check trailing * as correct
+            const starred = /\*\s*$/.test(l);
+            let clean = l.replace(/\*\s*$/, "").trim();
+            if (trimSpaces) clean = normalizeLine(clean);
+            if (!clean) return;
+            options.push(clean);
+            if (starred) answerIdx.add(options.length - 1);
           });
+
+          // If explicit letters were provided (A,B,..), override
+          if (answerLetters.length && options.length) {
+            answerIdx.clear();
+            answerLetters.forEach((letter) => {
+              const i = letter.charCodeAt(0) - 65; // A->0
+              if (i >= 0 && i < options.length) answerIdx.add(i);
+            });
+          }
+
+          // If no marked answer at all, skip this question
+          if (!answerIdx.size) {
+            // If user disallows multi but exactly one option ends with (đúng), parse? Not necessary.
+            continue;
+          }
+
+          // If not allowMulti and multiple answers found -> keep first
+          const ans = Array.from(answerIdx).sort((a, b) => a - b);
+          const finalAns = allowMulti ? ans : [ans[0]];
+
+          if (options.length >= 2 && options.length <= 8) {
+            questions.push({ text: qtext, options, answer: finalAns });
+          }
         }
 
-        // If no marked answer at all, skip this question
-        if(!answerIdx.size){
-          // If user disallows multi but exactly one option ends with (đúng), parse? Not necessary.
-          continue;
-        }
-
-        // If not allowMulti and multiple answers found -> keep first
-        const ans = Array.from(answerIdx).sort((a,b)=>a-b);
-        const finalAns = allowMulti ? ans : [ans[0]];
-
-        if(options.length>=2 && options.length<=8){
-          questions.push({ text:qtext, options, answer:finalAns });
-        }
+        return limit > 0 ? questions.slice(0, limit) : questions;
       }
 
-      return limit>0 ? questions.slice(0, limit) : questions;
-    }
+      function startQuiz() {
+        let qs = state.questions.slice();
+        if (state.shuffleQ) qs = shuffle(qs);
+        state.quizQuestions = qs;
+        currentPage = 1;
+        renderQuiz();
+      }
 
-    function renderQuiz(){
-      const container = $('#quizArea');
-      container.innerHTML = '';
+      function renderQuiz() {
+        const container = $("#quizArea");
+        container.innerHTML = "";
 
-      let questions = state.questions.slice();
-      if(state.shuffleQ) questions = shuffle(questions);
-
-      // Store shuffled questions for checking answers
-      state.shuffledQuestions = questions;
+        const questions = state.quizQuestions || [];
 
         // Pagination logic
         const totalPages = Math.ceil(questions.length / PAGE_SIZE);
@@ -328,63 +683,70 @@
 
         pageQuestions.forEach((q, iOnPage) => {
           const qi = startIdx + iOnPage;
-          const card = document.createElement('div');
-          card.className = 'q';
+          const card = document.createElement("div");
+          card.className = "q";
           card.dataset.questionIndex = qi;
 
           // Header with question and check button
-          const header = document.createElement('div');
-          header.className = 'q-header';
-          const h = document.createElement('h4');
-          h.textContent = `${qi+1}. ${q.text}`;
-          const checkBtn = document.createElement('button');
-          checkBtn.className = 'btn small';
-          checkBtn.textContent = 'Kiểm tra';
+          const header = document.createElement("div");
+          header.className = "q-header";
+          const h = document.createElement("h4");
+          h.textContent = `${qi + 1}. ${q.text}`;
+          const checkBtn = document.createElement("button");
+          checkBtn.className = "btn small";
+          checkBtn.textContent = "Kiểm tra";
           checkBtn.onclick = () => checkSingleQuestion(qi);
           header.appendChild(h);
           header.appendChild(checkBtn);
           card.appendChild(header);
 
-          let optOrder = q.options.map((_,i)=>i);
-          if(state.shuffleA) optOrder = shuffle(optOrder);
-          const isMulti = q.answer.length>1;
-          optOrder.forEach((oi)=>{
-            const opt = document.createElement('label');
-            opt.className = 'opt';
+          let optOrder = q.options.map((_, i) => i);
+          if (state.shuffleA) optOrder = shuffle(optOrder);
+          const isMulti = q.answer.length > 1;
+          optOrder.forEach((oi) => {
+            const opt = document.createElement("label");
+            opt.className = "opt";
             opt.dataset.optionIndex = oi;
-            const input = document.createElement('input');
-            input.type = isMulti ? 'checkbox' : 'radio';
+            const input = document.createElement("input");
+            input.type = isMulti ? "checkbox" : "radio";
             input.name = `q${qi}`;
             input.value = oi;
-            const span = document.createElement('span');
+            const span = document.createElement("span");
             span.textContent = q.options[oi];
-            opt.appendChild(input); opt.appendChild(span);
+            opt.appendChild(input);
+            opt.appendChild(span);
             card.appendChild(opt);
           });
           container.appendChild(card);
         });
 
         // Pagination controls
-        const pagContainer = document.createElement('div');
-        pagContainer.className = 'footer-actions';
-        pagContainer.style.justifyContent = 'center';
-        pagContainer.style.marginTop = '18px';
+        const pagContainer = document.createElement("div");
+        pagContainer.className = "footer-actions";
+        pagContainer.style.justifyContent = "center";
+        pagContainer.style.marginTop = "18px";
 
         if (totalPages > 1) {
-          const prevBtn = document.createElement('button');
-          prevBtn.className = 'btn small secondary';
-          prevBtn.textContent = '← Trang trước';
+          const prevBtn = document.createElement("button");
+          prevBtn.className = "btn small secondary";
+          prevBtn.textContent = "← Trang trước";
           prevBtn.disabled = currentPage === 1;
-          prevBtn.onclick = () => { currentPage--; renderQuiz(); };
+          prevBtn.onclick = () => {
+            currentPage--;
+            renderQuiz();
+          };
 
-          const nextBtn = document.createElement('button');
-          nextBtn.className = 'btn small secondary';
-          nextBtn.textContent = 'Trang sau →';
+          const nextBtn = document.createElement("button");
+          nextBtn.className = "btn small secondary";
+          nextBtn.textContent = "Trang sau →";
           nextBtn.disabled = currentPage === totalPages;
-          nextBtn.onclick = () => { currentPage++; renderQuiz(); };
+          nextBtn.onclick = () => {
+            currentPage++;
+            renderQuiz();
+          };
 
-          const pageInfo = document.createElement('span');
-          pageInfo.className = 'pill';
+          const pageInfo = document.createElement("span");
+          pageInfo.className = "pill";
           pageInfo.textContent = `Trang ${currentPage}/${totalPages}`;
 
           pagContainer.appendChild(prevBtn);
@@ -393,255 +755,295 @@
         }
         container.appendChild(pagContainer);
 
-        $('#totalQ').textContent = questions.length;
-        $('#btnSubmit').disabled = questions.length===0;
-        $('#btnRestart').disabled = questions.length===0;
-        $('#result').textContent = '';
+        $("#totalQ").textContent = questions.length;
+        $("#btnSubmit").disabled = questions.length === 0;
+        $("#btnRestart").disabled = questions.length === 0;
+        $("#result").textContent = "";
       }
 
-    function checkSingleQuestion(qi){
-      const card = $(`#quizArea .q[data-question-index="${qi}"]`);
-      if(!card || card.classList.contains('checked')) return;
-      
-      const inputs = $$('input', card);
-      const selected = new Set(inputs.filter(i=>i.checked).map(i=>parseInt(i.value,10)));
-      // Use shuffled questions instead of original state.questions
-      const ans = new Set(state.shuffledQuestions[qi].answer);
+      function checkSingleQuestion(qi) {
+        const card = $(`#quizArea .q[data-question-index="${qi}"]`);
+        if (!card || card.classList.contains("checked")) return;
 
-      // Mark card as checked to disable further input
-      card.classList.add('checked');
-
-      // Show results for each option
-      inputs.forEach(i=>{
-        const label = i.parentElement;
-        const idx = parseInt(i.value,10);
-        const isCorrect = ans.has(idx);
-        
-        if(i.checked && isCorrect){ 
-          label.classList.add('correct'); 
-        } else if(i.checked && !isCorrect){ 
-          label.classList.add('incorrect'); 
-        }
-        
-        // Always show correct answers
-        if(isCorrect){ 
-          label.classList.add('show-answer'); 
-        }
-      });
-
-      // Update button
-      const checkBtn = $('.btn', card);
-      const sameSize = selected.size===ans.size;
-      const allIn = [...selected].every(v=>ans.has(v));
-      if(sameSize && allIn){
-        checkBtn.textContent = '✓ Đúng';
-        checkBtn.style.background = 'var(--ok)';
-        checkBtn.style.color = 'white';
-        checkBtn.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.5)';
-      } else {
-        checkBtn.textContent = '✗ Sai';
-        checkBtn.style.background = 'var(--bad)';
-        checkBtn.style.color = 'white';
-        checkBtn.style.boxShadow = '0 0 16px rgba(239, 68, 68, 0.5)';
-      }
-      checkBtn.disabled = true;
-    }
-
-    function evaluate(){
-      const cards = $$('#quizArea .q');
-      let correct=0;
-
-      cards.forEach((card, idx)=>{
-        const qi = parseInt(card.dataset.questionIndex, 10);
-        const inputs = $$('input', card);
-        const selected = new Set(inputs.filter(i=>i.checked).map(i=>parseInt(i.value,10)));
+        const inputs = $$("input", card);
+        const selected = new Set(
+          inputs.filter((i) => i.checked).map((i) => parseInt(i.value, 10))
+        );
         // Use shuffled questions instead of original state.questions
-        const ans = new Set(state.shuffledQuestions[qi].answer);
+        const ans = new Set(state.quizQuestions[qi].answer);
 
-        inputs.forEach(i=>{
+        // Mark card as checked to disable further input
+        card.classList.add("checked");
+
+        // Show results for each option
+        inputs.forEach((i) => {
           const label = i.parentElement;
-          const idx = parseInt(i.value,10);
+          const idx = parseInt(i.value, 10);
           const isCorrect = ans.has(idx);
-          if(i.checked && isCorrect){ label.classList.add('correct'); }
-          else if(i.checked && !isCorrect){ label.classList.add('incorrect'); }
-          if(isCorrect){ label.classList.add('show-answer'); }
+
+          if (i.checked && isCorrect) {
+            label.classList.add("correct");
+          } else if (i.checked && !isCorrect) {
+            label.classList.add("incorrect");
+          }
+
+          // Always show correct answers
+          if (isCorrect) {
+            label.classList.add("show-answer");
+          }
         });
 
-        // score: full marks only if sets equal
-        const sameSize = selected.size===ans.size;
-        const allIn = [...selected].every(v=>ans.has(v));
-        if(sameSize && allIn) correct++;
-      });
-
-      const total = cards.length;
-      const pct = total? Math.round((correct/total)*100):0;
-      $('#result').innerHTML = `<span class="pill score">Điểm: ${correct}/${total} (${pct}%)</span>`;
-    }
-
-    function toJSON(){
-      return JSON.stringify({
-        meta:{ createdAt:new Date().toISOString(), locale:'vi-VN' },
-        questions: state.questions
-      }, null, 2);
-    }
-
-    function download(filename, text){
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([text], {type:'application/json'}));
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-
-    // Event wiring
-    $$('#panel-input input[type="checkbox"], #panel-input input[type="number"]').forEach(el=>{
-      el.addEventListener('change', ()=>{
-        state.allowMulti = $('#allowMulti').checked;
-        state.shuffleQ = $('#shuffleQ').checked;
-        state.shuffleA = $('#shuffleA').checked;
-      });
-    });
-
-    $('#btnParse').addEventListener('click', ()=>{
-      const opts = {
-        allowMulti: $('#allowMulti').checked,
-        trimSpaces: $('#trimSpaces').checked,
-        limit: parseInt($('#limitQuestions').value||'0',10)
-      };
-      const raw = $('#raw').value;
-      const qs = parseRaw(raw, opts);
-      state.questions = qs;
-      $('#parseStatus').innerHTML = qs.length
-        ? `✅ Đã tạo <strong>${qs.length}</strong> câu hỏi. Chuyển sang tab <strong>Làm bài</strong> để thử!`
-        : `⚠️ Không nhận diện được câu hỏi. Hãy kiểm tra định dạng hoặc thêm dòng <code>Đáp án: X</code> / dấu <code>*</code> cho đáp án đúng.`;
-      $('#jsonOut').value = toJSON();
-      renderQuiz();
-      activate('quiz');
-    });
-
-    $('#btnLoadDemo').addEventListener('click', ()=>{
-      const demo = `Thủ đô của Canada là gì?\nA) Toronto\nB) Vancouver\nC) Ottawa\nD) Montreal\nĐáp án: C\n---\nDãy núi dài nhất thế giới là?\n- A. Himalaya\n- B. Andes *\n- C. Rocky\n- D. Alps\n---\nQuốc gia nào có nhiều múi giờ nhất?\nA) Nga\nB) Mỹ\nC) Pháp *\nD) Trung Quốc\n---\nHành tinh gần Mặt Trời nhất?\nA) Sao Kim\nB) Sao Hỏa\nC) Sao Thủy *\nD) Trái Đất\n---\nĐại dương lớn nhất thế giới là?\nA) Đại Tây Dương\nB) Ấn Độ Dương\nC) Bắc Băng Dương\nD) Thái Bình Dương *`;
-      $('#raw').value = demo;
-    });
-
-    $('#btnClear').addEventListener('click', ()=>{
-      $('#raw').value='';
-      $('#parseStatus').textContent='';
-    });
-
-    $('#btnSubmit').addEventListener('click', evaluate);
-    $('#btnRestart').addEventListener('click', ()=>{
-      currentPage = 1;
-      renderQuiz();
-    });
-
-    $('#btnCopyJSON').addEventListener('click', ()=>{
-      const txt = $('#jsonOut').value;
-      navigator.clipboard.writeText(txt).then(()=>{
-        $('#btnCopyJSON').textContent = 'Đã copy!';
-        setTimeout(()=>$('#btnCopyJSON').textContent='Copy JSON', 1200);
-      });
-    });
-
-    $('#btnDownloadJSON').addEventListener('click', ()=>{
-      const fname = `quiz-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
-      download(fname, $('#jsonOut').value || toJSON());
-    });
-
-    $('#btnLoadJSON').addEventListener('click', ()=>{
-      try{
-        const data = JSON.parse($('#jsonIn').value);
-        if(Array.isArray(data.questions)){
-          state.questions = data.questions;
-          $('#parseStatus').innerHTML = `✅ Tải ${state.questions.length} câu từ JSON.`;
-          $('#jsonOut').value = toJSON();
-          renderQuiz();
-          activate('quiz');
-        } else throw new Error('JSON không đúng cấu trúc');
-      }catch(e){
-        alert('Không đọc được JSON: '+e.message);
-      }
-    });
-
-    // Tabs
-    function activate(name){
-      $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
-      $$('.panel').forEach(p=>p.classList.toggle('active', p.id===`panel-${name}`));
-    }
-    $$('.tab').forEach(btn=>btn.addEventListener('click', ()=>activate(btn.dataset.tab)));
-
-    // Input Mode Toggle (Text vs URL)
-    let fetchedContent = null; // Store fetched content temporarily
-    
-    function switchInputMode(mode) {
-      if (mode === 'text') {
-        $('#btnModeText').classList.add('active');
-        $('#btnModeUrl').classList.remove('active');
-        $('#modeText').classList.add('active');
-        $('#modeUrl').classList.remove('active');
-        // If we have fetched content, populate textarea
-        if (fetchedContent) {
-          $('#raw').value = fetchedContent;
-          fetchedContent = null;
+        // Update button
+        const checkBtn = $(".btn", card);
+        const sameSize = selected.size === ans.size;
+        const allIn = [...selected].every((v) => ans.has(v));
+        if (sameSize && allIn) {
+          checkBtn.textContent = "✓ Đúng";
+          checkBtn.style.background = "var(--ok)";
+          checkBtn.style.color = "white";
+          checkBtn.style.boxShadow = "0 0 16px rgba(16, 185, 129, 0.5)";
+        } else {
+          checkBtn.textContent = "✗ Sai";
+          checkBtn.style.background = "var(--bad)";
+          checkBtn.style.color = "white";
+          checkBtn.style.boxShadow = "0 0 16px rgba(239, 68, 68, 0.5)";
         }
-      } else if (mode === 'url') {
-        $('#btnModeText').classList.remove('active');
-        $('#btnModeUrl').classList.add('active');
-        $('#modeText').classList.remove('active');
-        $('#modeUrl').classList.add('active');
+        checkBtn.disabled = true;
       }
-    }
 
-    $('#btnModeText').addEventListener('click', () => switchInputMode('text'));
-    $('#btnModeUrl').addEventListener('click', () => switchInputMode('url'));
+      function evaluate() {
+        const cards = $$("#quizArea .q");
+        let correct = 0;
 
-    // Check URL button
-    $('#btnCheckUrl').addEventListener('click', () => {
-      const url = $('#urlInput').value.trim();
-      if (!url) {
-        $('#urlStatus').textContent = '⚠️ Vui lòng nhập URL';
-        return;
-      }
-      
-      $('#urlStatus').textContent = '⏳ Đang kiểm tra...';
-      $('#btnCheckUrl').disabled = true;
+        cards.forEach((card, idx) => {
+          const qi = parseInt(card.dataset.questionIndex, 10);
+          const inputs = $$("input", card);
+          const selected = new Set(
+            inputs.filter((i) => i.checked).map((i) => parseInt(i.value, 10))
+          );
+          // Use shuffled questions instead of original state.questions
+          const ans = new Set(state.quizQuestions[qi].answer);
 
-      fetch(url)
-        .then(r => r.ok ? r.text() : Promise.reject(`HTTP ${r.status}: ${r.statusText}`))
-        .then(text => {
-          // Directly populate textarea so user can create quiz immediately
-          $('#raw').value = text;
-          $('#urlStatus').innerHTML = `✅ Đã lấy thành công ${text.length} ký tự. Bạn có thể bấm "Tạo đề" ngay!`;
-          $('#btnCheckUrl').disabled = false;
-        })
-        .catch(e => {
-          $('#urlStatus').textContent = `❌ Lỗi: ${e}`;
-          $('#btnCheckUrl').disabled = false;
-        });
-    });
-
-    // Init
-    state.allowMulti = $('#allowMulti').checked;
-    state.shuffleQ = $('#shuffleQ').checked;
-    state.shuffleA = $('#shuffleA').checked;
-
-    // Auto-fetch content from ?src= param if present
-    (function fetchFromSrcParam() {
-      const params = new URLSearchParams(window.location.search);
-      const src = params.get('src');
-      if (src) {
-        fetch(src)
-          .then(r => r.ok ? r.text() : Promise.reject('Không lấy được nội dung từ src'))
-          .then(text => {
-            $('#raw').value = text;
-            $('#parseStatus').textContent = 'Đã tự động tải nội dung từ src.';
-          })
-          .catch(e => {
-            $('#parseStatus').textContent = 'Lỗi khi tải nội dung từ src: ' + e;
+          inputs.forEach((i) => {
+            const label = i.parentElement;
+            const idx = parseInt(i.value, 10);
+            const isCorrect = ans.has(idx);
+            if (i.checked && isCorrect) {
+              label.classList.add("correct");
+            } else if (i.checked && !isCorrect) {
+              label.classList.add("incorrect");
+            }
+            if (isCorrect) {
+              label.classList.add("show-answer");
+            }
           });
+
+          // score: full marks only if sets equal
+          const sameSize = selected.size === ans.size;
+          const allIn = [...selected].every((v) => ans.has(v));
+          if (sameSize && allIn) correct++;
+        });
+
+        const total = cards.length;
+        const pct = total ? Math.round((correct / total) * 100) : 0;
+        $(
+          "#result"
+        ).innerHTML = `<span class="pill score">Điểm: ${correct}/${total} (${pct}%)</span>`;
       }
-    })();
-  </script>
-</body>
+
+      function toJSON() {
+        return JSON.stringify(
+          {
+            meta: { createdAt: new Date().toISOString(), locale: "vi-VN" },
+            questions: state.questions,
+          },
+          null,
+          2
+        );
+      }
+
+      function download(filename, text) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([text], { type: "application/json" })
+        );
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      // Event wiring
+      $$(
+        '#panel-input input[type="checkbox"], #panel-input input[type="number"]'
+      ).forEach((el) => {
+        el.addEventListener("change", () => {
+          state.allowMulti = $("#allowMulti").checked;
+          state.shuffleQ = $("#shuffleQ").checked;
+          state.shuffleA = $("#shuffleA").checked;
+        });
+      });
+
+      $("#btnParse").addEventListener("click", () => {
+        const opts = {
+          allowMulti: $("#allowMulti").checked,
+          trimSpaces: $("#trimSpaces").checked,
+          limit: parseInt($("#limitQuestions").value || "0", 10),
+        };
+        const raw = $("#raw").value;
+        const qs = parseRaw(raw, opts);
+        state.questions = qs;
+        $("#parseStatus").innerHTML = qs.length
+          ? `✅ Đã tạo <strong>${qs.length}</strong> câu hỏi. Chuyển sang tab <strong>Làm bài</strong> để thử!`
+          : `⚠️ Không nhận diện được câu hỏi. Hãy kiểm tra định dạng hoặc thêm dòng <code>Đáp án: X</code> / dấu <code>*</code> cho đáp án đúng.`;
+        $("#jsonOut").value = toJSON();
+        startQuiz();
+        activate("quiz");
+      });
+
+      $("#btnLoadDemo").addEventListener("click", () => {
+        const demo = `Thủ đô của Canada là gì?\nA) Toronto\nB) Vancouver\nC) Ottawa\nD) Montreal\nĐáp án: C\n---\nDãy núi dài nhất thế giới là?\n- A. Himalaya\n- B. Andes *\n- C. Rocky\n- D. Alps\n---\nQuốc gia nào có nhiều múi giờ nhất?\nA) Nga\nB) Mỹ\nC) Pháp *\nD) Trung Quốc\n---\nHành tinh gần Mặt Trời nhất?\nA) Sao Kim\nB) Sao Hỏa\nC) Sao Thủy *\nD) Trái Đất\n---\nĐại dương lớn nhất thế giới là?\nA) Đại Tây Dương\nB) Ấn Độ Dương\nC) Bắc Băng Dương\nD) Thái Bình Dương *`;
+        $("#raw").value = demo;
+      });
+
+      $("#btnClear").addEventListener("click", () => {
+        $("#raw").value = "";
+        $("#parseStatus").textContent = "";
+      });
+
+      $("#btnSubmit").addEventListener("click", evaluate);
+      $("#btnRestart").addEventListener("click", () => {
+        startQuiz();
+      });
+
+      $("#btnCopyJSON").addEventListener("click", () => {
+        const txt = $("#jsonOut").value;
+        navigator.clipboard.writeText(txt).then(() => {
+          $("#btnCopyJSON").textContent = "Đã copy!";
+          setTimeout(() => ($("#btnCopyJSON").textContent = "Copy JSON"), 1200);
+        });
+      });
+
+      $("#btnDownloadJSON").addEventListener("click", () => {
+        const fname = `quiz-${new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace(/[:T]/g, "-")}.json`;
+        download(fname, $("#jsonOut").value || toJSON());
+      });
+
+      $("#btnLoadJSON").addEventListener("click", () => {
+        try {
+          const data = JSON.parse($("#jsonIn").value);
+          if (Array.isArray(data.questions)) {
+            state.questions = data.questions;
+            $(
+              "#parseStatus"
+            ).innerHTML = `✅ Tải ${state.questions.length} câu từ JSON.`;
+            $("#jsonOut").value = toJSON();
+            startQuiz();
+            activate("quiz");
+          } else throw new Error("JSON không đúng cấu trúc");
+        } catch (e) {
+          alert("Không đọc được JSON: " + e.message);
+        }
+      });
+
+      // Tabs
+      function activate(name) {
+        $$(".tab").forEach((t) =>
+          t.classList.toggle("active", t.dataset.tab === name)
+        );
+        $$(".panel").forEach((p) =>
+          p.classList.toggle("active", p.id === `panel-${name}`)
+        );
+      }
+      $$(".tab").forEach((btn) =>
+        btn.addEventListener("click", () => activate(btn.dataset.tab))
+      );
+
+      // Input Mode Toggle (Text vs URL)
+      let fetchedContent = null; // Store fetched content temporarily
+
+      function switchInputMode(mode) {
+        if (mode === "text") {
+          $("#btnModeText").classList.add("active");
+          $("#btnModeUrl").classList.remove("active");
+          $("#modeText").classList.add("active");
+          $("#modeUrl").classList.remove("active");
+          // If we have fetched content, populate textarea
+          if (fetchedContent) {
+            $("#raw").value = fetchedContent;
+            fetchedContent = null;
+          }
+        } else if (mode === "url") {
+          $("#btnModeText").classList.remove("active");
+          $("#btnModeUrl").classList.add("active");
+          $("#modeText").classList.remove("active");
+          $("#modeUrl").classList.add("active");
+        }
+      }
+
+      $("#btnModeText").addEventListener("click", () =>
+        switchInputMode("text")
+      );
+      $("#btnModeUrl").addEventListener("click", () => switchInputMode("url"));
+
+      // Check URL button
+      $("#btnCheckUrl").addEventListener("click", () => {
+        const url = $("#urlInput").value.trim();
+        if (!url) {
+          $("#urlStatus").textContent = "⚠️ Vui lòng nhập URL";
+          return;
+        }
+
+        $("#urlStatus").textContent = "⏳ Đang kiểm tra...";
+        $("#btnCheckUrl").disabled = true;
+
+        fetch(url)
+          .then((r) =>
+            r.ok
+              ? r.text()
+              : Promise.reject(`HTTP ${r.status}: ${r.statusText}`)
+          )
+          .then((text) => {
+            // Directly populate textarea so user can create quiz immediately
+            $("#raw").value = text;
+            $(
+              "#urlStatus"
+            ).innerHTML = `✅ Đã lấy thành công ${text.length} ký tự. Bạn có thể bấm "Tạo đề" ngay!`;
+            $("#btnCheckUrl").disabled = false;
+          })
+          .catch((e) => {
+            $("#urlStatus").textContent = `❌ Lỗi: ${e}`;
+            $("#btnCheckUrl").disabled = false;
+          });
+      });
+
+      // Init
+      state.allowMulti = $("#allowMulti").checked;
+      state.shuffleQ = $("#shuffleQ").checked;
+      state.shuffleA = $("#shuffleA").checked;
+
+      // Auto-fetch content from ?src= param if present
+      (function fetchFromSrcParam() {
+        const params = new URLSearchParams(window.location.search);
+        const src = params.get("src");
+        if (src) {
+          fetch(src)
+            .then((r) =>
+              r.ok ? r.text() : Promise.reject("Không lấy được nội dung từ src")
+            )
+            .then((text) => {
+              $("#raw").value = text;
+              $("#parseStatus").textContent = "Đã tự động tải nội dung từ src.";
+            })
+            .catch((e) => {
+              $("#parseStatus").textContent =
+                "Lỗi khi tải nội dung từ src: " + e;
+            });
+        }
+      })();
+    </script>
+  </body>
 </html>
